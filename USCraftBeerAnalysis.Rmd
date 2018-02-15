@@ -1,0 +1,55 @@
+---
+title: "US Craft Beer Analysis"
+author: "Nathan Wall, Muthu Palanisamy, Nathan Lara"
+date: "February 15, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Analysis of US Craft beers Alcohol using Volume (ABV) & Internation Bitterness Unit (IBU)
+We will be analyzing data on 2410 US craft beers from 558 different breweries to identify various characteristics of the US craft beer industry. Spefically we will be focusing on a beers ABV and IBU and there geographic properties and relationships to one another.
+
+### Reading & Manipulating Data from source
+The data for this analysis is stored on GitHub in the following repository:
+https://github.com/nateewall/MSDS6306_CaseStudy1
+
+We will be using R's RCurl package to read this data directly from the web.
+```{r}
+#if you do not have the RCurl package then install
+#install.packages("RCurl")
+#Reference RCurl package to read from web
+require(RCurl)
+
+# Read Breweries dataset
+breweriesURL <- 'https://raw.githubusercontent.com/nateewall/MSDS6306_CaseStudy1/master/Breweries.csv'
+Breweries <-read.csv(text=getURL(breweriesURL), header=T)
+
+# Read the Beers Dataset
+beersURL <- 'https://raw.githubusercontent.com/nateewall/MSDS6306_CaseStudy1/master/Beers.csv'
+Beers <-read.csv(text=getURL(beersURL), header=T)
+```
+
+
+### Exploring the data
+Once the data is read into R data.frames from the web we will quickly review the format of the data to make sure all feilds were captured appropriately.
+
+Breweries:
+```{r}
+# Review the data
+str(Breweries)
+```
+
+Our Breweries data.frame has 558 observations with 551 distinct breweries from 51 states and 384 different cities.
+
+Below we will see how many breweries are located in each of the 51 states in our data:
+```{r}
+# How many breweries are present in each state?
+BreweryStates <- summary(Breweries$State)
+#Print in sorted order
+sort(BreweryStates, decreasing = T)
+```
+Colorado has the most breweries in our data with 47 breweries, followed closely by California's 39. Arkansas has the fewest with 2.
+
