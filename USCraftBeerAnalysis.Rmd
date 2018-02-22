@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Analysis of US Craft beers Alcohol using Volume (ABV) & Internation Bitterness Unit (IBU)
+# Analysis of US Craft beers Alcohol by Volume (ABV) & Internation Bitterness Unit (IBU)
 We will be analyzing data on 2410 US craft beers from 558 different breweries to identify various characteristics of the US craft beer industry. Spefically we will be focusing on a beers ABV and IBU and there geographic properties and relationships to one another.
 
 ### Reading & Manipulating Data from source
@@ -52,4 +52,38 @@ BreweryStates <- summary(Breweries$State)
 sort(BreweryStates, decreasing = T)
 ```
 Colorado has the most breweries in our data with 47 breweries, followed closely by California's 39. Arkansas has the fewest with 2.
+
+
+### Merge the data sets together to have the geography for each of the beer.
+
+Below is the code used to merge the two data sets by Brewery ID and a quick review of top and the bottom of our new data set.
+```{r}
+mergedBeerBreweries<-merge(
+  Breweries, Beers, by.x = "Brew_ID", by.y ="Brewery_id", all= TRUE
+)
+
+# Assign appropriate name  
+names(mergedBeerBreweries)[2]<-"BreweryName"
+names(mergedBeerBreweries)[5]<-"BeerName"
+
+#print the top 6 records
+head(mergedBeerBreweries, 6)
+#print the bottom 6 records
+tail(mergedBeerBreweries, 6)
+```
+
+Based on the output above we can see that the data appears to have successfully been merged. Although there are lots of NA's in the for the IBU column so we will perform a count of all NA's in our data.
+
+```{r}
+# There are multiple ways to get the NA's
+# Can go with sapply..
+sapply(mergedBeerBreweries, function(x) sum(is.na(x)))
+```
+
+It appears the most of the columns have 0 NA's with the exception of 62 NA's for ABV & 1005 NA's for IBU. We are assuming this data was not available for the beers from this group.
+
+### Analyzing the Beers ABV & IBU
+
+First, we will begin by taking a look at the median alcohol content for each of the states to determine if there are any major differences.
+
 
