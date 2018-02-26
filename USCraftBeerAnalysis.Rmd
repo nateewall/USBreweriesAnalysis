@@ -1,7 +1,7 @@
 ---
 title: "US Craft Beer Analysis"
-author: "Nathan Wall, Muthu Palanisamy, Nathan Lara"
-date: "February 15, 2018"
+author: "Muthu Palanisamy, Nathan Wall, Nathan Lara"
+date: "February 28, 2018"
 output: html_document
 runtime: shiny
 ---
@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Analysis of US Craft beers Alcohol by Volume (ABV) & Internation Bitterness Unit (IBU)
-We will be analyzing data on 2410 US craft beers from 558 different breweries to identify various characteristics of the US craft beer industry. Spefically we will be focusing on a beers ABV and IBU and there geographic properties and relationships to one another.
+We will be analyzing data on 2410 US craft beers from 558 different breweries to identify various characteristics of the US craft beer industry. Spefically we will be focusing on a beers ABV and IBU and there geographic properties as well as any relationships to one another.
 
 ### Reading & Manipulating Data from source
 The data for this analysis is stored on GitHub in the following repository:
@@ -22,7 +22,7 @@ We will be using R's RCurl package to read this data directly from the web.
 #if you do not have the RCurl package then install
 #install.packages("RCurl")
 #Reference RCurl package to read from web
-require(RCurl)
+library(RCurl)
 
 # Read Breweries dataset
 breweriesURL <- 'https://raw.githubusercontent.com/nateewall/MSDS6306_CaseStudy1/master/Breweries.csv'
@@ -55,7 +55,7 @@ BreweryStates <- summary(Breweries$State)
 #Print in sorted order
 sort(BreweryStates, decreasing = T)
 ```
-Colorado has the most breweries in our data with 47 breweries, followed closely by California's 39. Arkansas has the fewest with 2.
+Colorado has the most breweries in our data with 47 breweries, followed closely by California's 39. Arkansas has the fewest with 2. Arkansas seems like a very unideal place for the beer fan, but perhaps a ripe area for new brewery development.
 
 ### Merge the data sets together to have the geography for each of the beer.
 
@@ -89,7 +89,7 @@ It appears the most of the columns have 0 NA's with the exception of 62 NA's for
 
 First, we will begin by taking a look at the median alcohol content for each of the states to determine if there are any major differences.
 ```{r}
-require(dplyr)
+library(dplyr)
 medianIBU <- data.frame(
   mergedBeerBreweries %>%
     group_by(State) %>% 
@@ -104,32 +104,44 @@ par(mar=c(5, 6, 4 ,2))
 barplot(medianIBU$median, names.arg = medianIBU$State, 
         xlab="States",
         ylab="Median",
-        main = 'IBU by State')
+        main = 'IBU by State',
+        col=rgb(0,100,0,150,maxColorValue=255), pch=16)
 ```
 
-Breweies from Main (ME) has median IBU of 61ppm isohumulone, 
-IBU is a scale that goes from 1-100, standard budwiser has 7.
+Breweies from Maine (ME) has median IBU of 61ppm isohumulone, 
+IBU is a scale that goes from 1-100, standard Budweiser has 7.
 
 Which state has the maximum alcoholic (ABV) beer? Which state has the most bitter (IBU) beer?
 
 ```{r}
 #get the max ABV
 maxABV <- mergedBeerBreweries[which(mergedBeerBreweries$ABV == max(mergedBeerBreweries$ABV,na.rm = T)), ]
-maxABV$State
+paste0(maxABV$BeerName, " from ", maxABV$City, ", ", maxABV$State, " has the maximum ABV in our data with ", maxABV$ABV, sep=" ")
 ```
+Colorado in the dataset has the max alcohol by volumne (ABV) beer. Additionally, here are the top 10 beers by ABV.
+```{r}
+top10ABV <- mergedBeerBreweries[order(-mergedBeerBreweries$ABV),][1:10,]
+top10ABV[,c("BeerName","City","State","ABV")]
+```
+Both Colorado & Michigan are representated well in the top 10 with 5 of the top 10 by ABV. 
 
-Colorado in the dataset has the max alcohol by volumne (ABV) beer.
 ```{r}
 #get the max IBU
 maxIBU <- mergedBeerBreweries[which(mergedBeerBreweries$IBU == max(mergedBeerBreweries$IBU,na.rm = T)), ]
-maxIBU$State
+paste0(maxIBU$BeerName, " from ", maxIBU$City, ", ", maxIBU$State, " has the maximum ABV in our data with ", maxIBU$IBU, sep=" ")
 ```
+Astoria Bitter Bitch Imperial IPA has the max IBU of 138 from Portland, OR. Additionally will we look at the top 10 beers by IBU.
 
-Astoria Bitter Bitch Imperial IPA has the max IBU of 138 from Portland, OR.
+```{r}
+top10IBU <- mergedBeerBreweries[order(-mergedBeerBreweries$IBU),][1:10,]
+top10IBU[,c("BeerName","City","State","IBU")]
+```
+It appears there may be a duplicate of the Heady Topper, although as they have different beer ID's.
+
 ```{r}
 # Summary statistics for the ABV variable.
-summary(mergedBeerBreweries$ABV)
-require(shiny)
+# summary(mergedBeerBreweries$ABV)
+library(shiny)
 server <- function(input, output) {
   # Define histogram output
   output$beerHist <- renderPlot({  # "beerHist" in UI also
@@ -178,7 +190,6 @@ plot(mergedBeerBreweries$IBU, mergedBeerBreweries$ABV,
      main = 'Alcohol Volume Vs. Bitterness correlation',
      col=rgb(0,100,0,150,maxColorValue=255), pch=16)
 abline(lm(mergedBeerBreweries$ABV~mergedBeerBreweries$IBU), col="red")
-summary(mylm)
 ```
 
 There is an upward trend with the linear regression plot strongly suggests there is positive correlation between Alcohol volume and bitterness.
