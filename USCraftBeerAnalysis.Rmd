@@ -18,6 +18,7 @@ The data for this analysis is stored on GitHub in the following repository:
 https://github.com/nateewall/MSDS6306_CaseStudy1
 
 We will be using R's RCurl package to read this data directly from the web.
+
 ```{r}
 #if you do not have the RCurl package then install
 #install.packages("RCurl")
@@ -38,28 +39,30 @@ Beers <-read.csv(text=getURL(beersURL), header=T)
 Once the data is read into R data.frames from the web we will quickly review the format of the data to make sure all feilds were captured appropriately.
 
 Breweries:
+
 ```{r}
 # Review the data
 str(Breweries)
 str(Beers)
-summary(Breweries)
-summary(Beers)
 ```
 
 Our Breweries data.frame has 558 observations with 551 distinct breweries from 51 states and 384 different cities.
 
 Below we will see how many breweries are located in each of the 51 states in our data:
+
 ```{r}
 # How many breweries are present in each state?
 BreweryStates <- summary(Breweries$State)
 #Print in sorted order
 sort(BreweryStates, decreasing = T)
 ```
-Colorado has the most breweries in our data with 47 breweries, followed closely by California's 39. Arkansas has the fewest with 2. Arkansas seems like a very unideal place for the beer fan, but perhaps a ripe area for new brewery development.
+
+Colorado has the most breweries in our data with 47 breweries, followed closely by California's 39. Arkansas has the fewest with 2..
 
 ### Merge the data sets together to have the geography for each of the beer.
 
-Below is the code used to merge the two data sets by Brewery ID and a quick review of top and the bottom of our new data set.
+Below is the code used to merge the two data sets by Brewery ID and a quick review of top and the bottom of our new data set. We also join this data to get the full State name for some geographic 
+
 ```{r}
 mergedBeerBreweries<-merge(
   Breweries, Beers, by.x = "Brew_ID", by.y ="Brewery_id", all= TRUE
@@ -100,20 +103,22 @@ It appears the most of the columns have 0 NA's with the exception of 62 NA's for
 ### Analyzing the Beers ABV & IBU
 
 First, we will begin by taking a look at the median alcohol content for each of the states to determine if there are any major differences.
+
 ```{r}
 library(dplyr)
-medianIBU <- data.frame(
-  mergedData %>%
-    group_by(State, statename) %>% 
-    summarise(median = median(IBU, na.rm = T))
+# summarize ABV & IBU by state
+plotData <- data.frame(
+  mergedData[,c("State","statename","IBU","ABV")] %>%
+    group_by(State,statename) %>% 
+    summarise_all(funs(median),na.rm = T)
 )
 
-medianIBU <- medianIBU[order(-medianIBU$median),]
+plotData <- plotData[order(-plotData$IBU),]
 
 # Set margins 
 par(mar=c(5, 6, 4 ,2))
 
-barplot(medianIBU$median, names.arg = medianIBU$State, 
+barplot(plotData$IBU, names.arg = plotData$State, 
         xlab="States",
         ylab="Median",
         main = 'IBU by State',
@@ -123,26 +128,34 @@ barplot(medianIBU$median, names.arg = medianIBU$State,
 Breweies from Maine (ME) has median IBU of 61ppm isohumulone, 
 IBU is a scale that goes from 1-100, standard Budweiser has 7.
 
-We recognize that this may be difficult to read so we also plot the median IBU for each State to help understand any geographical patterns.
+```{r}
+# sort the data by ABV as this is all about comparing
+plotData <- plotData[order(-plotData$ABV),]
+
+# Now plot the data 
+barplot(plotData$ABV, names.arg = plotData$State, 
+        xlab="States",
+        ylab="Median",
+        main = 'ABV by State',
+        col=rgb(100,0,0,150,maxColorValue=255), pch=16)
+```
+
+We find that our nation's capital holds the tie for the highest Median ABV with a state more commonly associated with whiskey, Kentucky. Both boasting a median ABV of 6.25%. For reference Budweiser comes in aroun 5% ABV.
+
+
+However, the barplots are little difficult to read so we opted to plot these median values on maps in order to better show the relationship between ABV & IBU we explored these two values geographically.
+
 ```{r}
 library(fiftystater)
 library(ggplot2)
-
-# summarize data by IBU
-plotData <- data.frame(
-  mergedData %>%
-    group_by(statename) %>% 
-    summarise(medianIBU = median(IBU, na.rm = T))
-)
 
 plotData$id <- as.character(plotData$statename)
 data("fifty_states")
 Total <- merge(fifty_states, plotData, by="id")
 
-
 p <- ggplot(Total, aes(map_id = id)) + 
   # map points to the fifty_states shape data
-  geom_map(aes(fill = medianIBU), map = fifty_states) + 
+  geom_map(aes(fill = IBU), map = fifty_states) + 
   expand_limits(x = fifty_states$long, y = fifty_states$lat) +
   coord_map() +
   scale_x_continuous(breaks = NULL) + 
@@ -153,11 +166,33 @@ p <- ggplot(Total, aes(map_id = id)) +
 p1 <- p + scale_fill_continuous(low = "palegreen", high = "darkgreen", guide="colorbar")
 # add border boxes to AK/HI
 p2 <- p1 + fifty_states_inset_boxes() 
+# create title & legend label
 p2 + labs(fill = "Median IBU" 
           ,title = "Median IBU for Each State", x="", y="")
+```
+
+This shows some of the states with more bitter beer like Maine, Florida, West Virginia, and New Mexico. But also shows the states with less bitter beer like Wisconsin. Now lets see which states move up the ABV Scale.
+
+```{r}
+q <- ggplot(Total, aes(map_id = id)) + 
+  # map points to the fifty_states shape data
+  geom_map(aes(fill = ABV), map = fifty_states) + 
+  expand_limits(x = fifty_states$long, y = fifty_states$lat) +
+  coord_map() +
+  scale_x_continuous(breaks = NULL) + 
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "", y = "") +
+  theme(legend.position = "bottom", 
+        panel.background = element_blank())
+q1 <- q + scale_fill_continuous(low = "thistle1", high = "darkred", guide="colorbar")
+# add border boxes to AK/HI
+q2 <- q1 + fifty_states_inset_boxes() 
+q2 + labs(fill = "Median ABV" 
+          ,title = "Median ABV for Each State", x="", y="")
 
 ```
-This shows some of the states with more bitter beer like Vermont, Florida, West Virginia. But also shows the states with less bitter beer like Wisconsin.
+
+It is interesting to see the states that seem to favor the High ABV & High IBU like West Virginia & New Mexico, while the bitter Maine falls more towards the middle of ranks in terms of ABV. This may be driven by the state controlled ABV limits.
 
 But, which state has the maximum alcoholic (ABV) beer? Which state has the most bitter (IBU) beer?
 
@@ -166,11 +201,14 @@ But, which state has the maximum alcoholic (ABV) beer? Which state has the most 
 maxABV <- mergedData[which(mergedData$ABV == max(mergedData$ABV,na.rm = T)), ]
 paste0(maxABV$BeerName, " from ", maxABV$City, ", ", maxABV$State, " has the maximum ABV in our data with ", maxABV$ABV, sep=" ")
 ```
-Colorado in the dataset has the max alcohol by volumne (ABV) beer. Additionally, here are the top 10 beers by ABV.
+
+The Lee Hill Series Vol. 5 - Belgian Style Quadrupel Ale from Colorado has the max alcohol by volumne (ABV) beer. However, we have several others that deserve honorable mention.
+
 ```{r}
 top10ABV <- mergedData[order(-mergedData$ABV),][1:10,]
 top10ABV[,c("BeerName","City","State","ABV")]
 ```
+
 Both Colorado & Michigan are representated well in the top 10 with 5 of the top 10 by ABV. 
 
 ```{r}
@@ -178,13 +216,18 @@ Both Colorado & Michigan are representated well in the top 10 with 5 of the top 
 maxIBU <- mergedData[which(mergedData$IBU == max(mergedData$IBU,na.rm = T)), ]
 paste0(maxIBU$BeerName, " from ", maxIBU$City, ", ", maxIBU$State, " has the maximum ABV in our data with ", maxIBU$IBU, sep=" ")
 ```
+
 Astoria Bitter Bitch Imperial IPA has the max IBU of 138 from Portland, OR. Additionally will we look at the top 10 beers by IBU.
 
 ```{r}
 top10IBU <- mergedData[order(-mergedData$IBU),][1:10,]
 top10IBU[,c("BeerName","City","State","IBU")]
 ```
-It appears there may be a duplicate of the Heady Topper, although as they have different beer ID's.
+
+The duplicate Heady Topper's may just an error. Or it may just be so good we felt it needed to be in the data twice. Ranked 4.72/5 on Beer Advocate and #2 overall!
+
+
+Now before we look directly at the relationship lets get an idea of how IBU & ABV are distributed in our data.
 
 ```{r}
 # Summary statistics for the ABV variable.
@@ -227,11 +270,14 @@ shinyApp(ui = ui, server = server)
 #hist(mergedBeerBreweries$ABV)
 ```
 
+Based on this ABV seems centered around 5.6% with a slight right skew. While IBU's in this dataset appear even more right skewed with a median IBU of 35.
+
+
+However, lets explore how these two variables relate.
 ```{r}
 # Is there an apparent relationship between the bitterness 
 # of the beer and its alcoholic content? Draw a scatter plot.
 
-mylm<-lm(mergedData$IBU ~ mergedData$ABV)
 plot(mergedData$IBU, mergedData$ABV, 
      xlab="International Bitterness Units",
      ylab="Alcohol by volume",
@@ -240,4 +286,9 @@ plot(mergedData$IBU, mergedData$ABV,
 abline(lm(mergedData$ABV~mergedData$IBU), col="red")
 ```
 
-There is an upward trend with the linear regression plot strongly suggests there is positive correlation between Alcohol volume and bitterness.
+There is a postive trend with the linear regression plot suggests there is positive correlation between Alcohol volume and bitterness. However, IBU only explains ~45% of the variability in ABV alone. Perhaps accounting for geography or beer styles would help give us more of an understanding of the bitterness in beer. However, w/ over 100 styles in this data that falls outside the scope of this analysis.
+
+
+
+
+
