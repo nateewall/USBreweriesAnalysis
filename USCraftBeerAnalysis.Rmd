@@ -287,7 +287,7 @@ plot(mergedData$IBU, mergedData$ABV,
      xlab="International Bitterness Units",
      ylab="Alcohol by volume",
      main = 'Alcohol Volume Vs. Bitterness correlation',
-     col=brewer.pal(2, "Set1"), pch=19)
+     col='#8DC13D', pch=19)
 abline(lm(mergedData$ABV~mergedData$IBU), col="red")
 ```
 
