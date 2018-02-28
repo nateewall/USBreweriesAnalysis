@@ -569,13 +569,27 @@ help give us a better understanding of the bitterness in beer.
 We also keep in mind that there are over 100 styles in this data that falls outside the scope of this analysis.
 
 
+## Reports & Analysis
+Case Study1 Presentation Final.pptx - A summary of findings used to present analysis
 
 
-
-## Reports
-
-
-
-
+USCraftBeerAnalysis.Rmd - Markdown file that was used to complete all of the analysis. Graphs included are:
+- Bar Chart with counts of breweries by state
+- Bar Chart of Median IBU by State
+- Barchart of Median ABV by State
+- Median IBU plotted onto map of USA
+- Median ABV plotted onto map of USA
+- Shiny Applet for reviewing distribution of IBU,ABV, & Ounces
+- Scatter Plot of IBU by ABV
 
 ## References
+
+IBU – International Bitterness Unit
+Measured as part per million of isohumulone found. It starts at 0 and open ended at the top. Standard Budweiser has 7 IBU & average IPA between 40-60. Double IPAs are ranging from 60-100.
+
+ABV – Alcohol by Volume
+This tells us what percentage of the beer is alcohol. Samuel Adams Utopias 24ounce boasts an ABV of 27%, typical Vodka has 40% ABV
+
+R Packages used: fiftystater, RColorBrewer, Shiny , RCurl, dplyr & ggplot2, 
+
+Codebase & technical analysis details can be found in: https://github.com/nateewall/MSDS6306_CaseStudy1
