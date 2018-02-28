@@ -563,7 +563,7 @@ col="red")
 
 ```
 
-Ultimately we conclude that there is a postive trend with the linear regression plot suggests there is positive correlation between Alcohol volume and bitterness. 
+Ultimately, we conclude that there is a postive trend between ABV and IBU. We've analyzed the linear regression plot and observe this positive correlation between alcohol volume and bitterness. 
 However, IBU only explains ~45% of the variability in ABV alone. Perhaps accounting for geographic differences or beer styles would
 help give us a better understanding of the bitterness in beer.
 We also keep in mind that there are over 100 styles in this data that falls outside the scope of this analysis.
