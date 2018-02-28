@@ -43,10 +43,31 @@ Breweries:
 ```{r Review Data}
 # Review the data
 str(Breweries)
-str(Beers)
+# check for duplicate Breweries in the data
+brewFreq <- table(Breweries$Name)
+# find the duplicate breweries
+dupBreweries <- Breweries[Breweries$Name %in% names(brewFreq[brewFreq > 1]) , ]
+# how many breweries are dup
+length(unique(dupBreweries$Name))
 ```
 
-Our Breweries data.frame has 558 observations with 551 distinct breweries from 51 states and 384 different cities.
+7 of the 'Names' from the Breweries data were also duplicated. Some of which were from different cities. It was the assumption of the group that these represented different locations of the same brewery, as they were assigned to different distinct ID's
+
+```{r Review Data}
+# Review the Data
+str(Beers)
+# check for duplicate Breweries in the data
+beerFreq <- table(Beers$Name)
+# find the duplicate breweries
+dupBeers <- Beers[Beers$Name %in% names(beerFreq[beerFreq > 1]) , ]
+# how many breweries are dup
+length(unique(dupBeers$Name))
+```
+82 of the "Names" from the Beers dataset were duplicated. However, as they were assigned to different beer ID's we operated under the assumption that these truly represented different styles/years of the same beer.
+
+
+
+In total, our Breweries data.frame has 558 observations with 551 distinct breweries from 51 states and 384 different cities.
 
 Below we will see how many breweries are located in each of the 51 states in our data:
 
