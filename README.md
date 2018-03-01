@@ -112,7 +112,7 @@ xlab="States",
 col=brewer.pal(12,"Set3"))
 
 ```
-- Colorado has the most breweries in our data with 47 breweries, followed closely by California's 39. Arkansas has the fewest with
+-Colorado has the most breweries in our data with 47 breweries, followed closely by California's 39. Arkansas has the fewest with
 2..
 
 -Merge the data sets together to have the geography for
@@ -448,8 +448,7 @@ library(shiny)
 
 server <- function(input, output) {
 
-  - Define
-histogram output
+#Define histogram output
 
   output$beerHist
 <- renderPlot({  -
@@ -526,11 +525,10 @@ plotOutput("beerHist")  -
 
 )
 
- 
 
 shinyApp(ui = ui, server = server)
 
--hist(mergedBeerBreweries$ABV)
+#hist(mergedBeerBreweries$ABV)
 
 ```
 
