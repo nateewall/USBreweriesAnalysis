@@ -116,10 +116,10 @@ col=brewer.pal(12,"Set3"))
 2..
 
 -Merge the data sets together to have the geography for
-each of the beer.
+each of the beers.
 
 -Below is the code used to merge the two data sets by
-Brewery ID and a quick review of top and the bottom of our new data set. We
+Brewery ID and a quick review of the top and bottom of our new data set. We
 also join this data to get the full State name by geography
 
 ```{r Merge Dataset}
@@ -170,7 +170,7 @@ head(mergedData, 6)
 tail(mergedData, 6)
 
 ```
--Once the code above is executed we observe the output above and see that the data appears to have successfully been merged. 
+-Once the code above is executed we observe the output and see that the data appears to have successfully been merged. 
 
 -However, we see that there are lots of NA's in the IBU column so we will perform a count of all NA's in our data.
 
@@ -183,7 +183,7 @@ sapply(mergedData, function(x) sum(is.na(x)))
 
 ```
 
--It appears the most of the columns have 0 NA's with the exception of 62 NA's for ABV & 1005 NA's for IBU. 
+-It appears that most of the columns have 0 NA's with the exception of 62 NA's for ABV & 1005 NA's for IBU. 
 
 -We are assuming this data was not available for the beers from this group.
 
@@ -237,7 +237,7 @@ col=brewer.pal(12,"Set3"))
 ```
 -Breweies from Maine (ME) have a median IBU of 61ppm isohumulone 
 
--IBU is scaled from 1-100, standard Budweiser has 7.
+-IBU is scaled from 1-100, standard Budweiser has an IBU of 7.
 
 ```{r Plot ABV}
 #sort the data by ABV as this is all about comparing
