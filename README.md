@@ -136,7 +136,7 @@ by.x = "Brew_ID", by.y ="Brewery_id", all= TRUE
 use
 mergedBeerBreweries$State<-trimws(mergedBeerBreweries$State)
 
-#pull the state names to join with abreviated state name
+#pull the state names to join with abbreviated state name
 
 states <- data.frame(cbind(state.abb,
 tolower(state.name)))
